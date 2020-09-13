@@ -4,7 +4,7 @@ metadata:
   labels:
     app: vote
   name: vote
-  namespace: vote
+  namespace: logs
 spec:
   replicas: 1
   selector:
