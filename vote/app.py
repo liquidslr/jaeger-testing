@@ -10,6 +10,7 @@ import time
 import logging
 import random
 from jaeger_client import Config
+from flask_opentracing import FlaskTracing
 
 
 option_a = os.getenv('OPTION_A', "Cats")
@@ -18,7 +19,24 @@ hostname = socket.gethostname()
 
 app = Flask(__name__)
 
-
+logging.getLogger('').handlers = []
+logging.basicConfig(format='%(message)s', level=logging.DEBUG)    
+config = Config(
+    config={
+        'sampler': {
+            'type': 'const',
+            'param': 1,
+        },
+        'local_agent': {
+            'reporting_host': "10.60.0.25",
+            'reporting_port': 5775,
+        },
+        'logging': True,
+    },
+    service_name='voting',
+)
+jaeger_tracer = config.initialize_tracer()
+tracing = FlaskTracing(jaeger_tracer)
 
 def get_redis():
     if not hasattr(g, 'redis'):
@@ -27,7 +45,7 @@ def get_redis():
 
 @app.route("/", methods=['POST','GET'])
 def hello():
-    with tracer.start_active_span('booking') as scope:
+    with jaeger_tracer.start_active_span('booking') as scope:
         voter_id = request.cookies.get('voter_id')
 
         if not voter_id:
@@ -59,25 +77,6 @@ if __name__ == "__main__":
     # yield to IOLoop to flush the spans
 
 
-def init_tracer(service):
-    logging.getLogger('').handlers = []
-    logging.basicConfig(format='%(message)s', level=logging.DEBUG)    
-    config = Config(
-        config={
-            'sampler': {
-                'type': 'const',
-                'param': 1,
-            },
-            'local_agent': {
-                'reporting_host': "10.60.0.25",
-                'reporting_port': 5775,
-            },
-            'logging': True,
-        },
-        service_name=service,
-    )
-    return config.initialize_tracer()
 
-tracer = init_tracer('voting')
-time.sleep(2)
-tracer.close()
+
+

@@ -2,3 +2,4 @@ Flask
 Redis
 gunicorn
 jaeger-client
+Flask-Opentracing
