@@ -28,7 +28,7 @@ def init_tracer(service):
                 'param': 1,
             },
             'local_agent': {
-                'reporting_host': "127.0.0.1",
+                'reporting_host': "10.60.0.25",
                 'reporting_port': 5775,
             },
             'logging': True,
