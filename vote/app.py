@@ -19,6 +19,24 @@ hostname = socket.gethostname()
 
 app = Flask(__name__)
 
+logging.getLogger('').handlers = []
+logging.basicConfig(format='%(message)s', level=logging.DEBUG)    
+config = Config(
+    config={
+        'sampler': {
+            'type': 'const',
+            'param': 1,
+        },
+        'local_agent': {
+            'reporting_host': "10.60.0.25",
+            'reporting_port': 5775,
+        },
+        'logging': True,
+    },
+    service_name='voting',
+)
+jaeger_tracer = config.initialize_tracer()
+tracing = FlaskTracing(jaeger_tracer)
 
 def get_redis():
     if not hasattr(g, 'redis'):
@@ -61,21 +79,3 @@ if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80, debug=True, threaded=True)
     # yield to IOLoop to flush the spans
 
-logging.getLogger('').handlers = []
-logging.basicConfig(format='%(message)s', level=logging.DEBUG)    
-config = Config(
-    config={
-        'sampler': {
-            'type': 'const',
-            'param': 1,
-        },
-        'local_agent': {
-            'reporting_host': "10.60.0.25",
-            'reporting_port': 5775,
-        },
-        'logging': True,
-    },
-    service_name='voting',
-)
-jaeger_tracer = config.initialize_tracer()
-tracing = FlaskTracing(jaeger_tracer)
