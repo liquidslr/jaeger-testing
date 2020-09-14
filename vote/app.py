@@ -28,7 +28,7 @@ config = Config(
             'param': 1,
         },
         'local_agent': {
-            'reporting_host': "10.60.0.25",
+            'reporting_host': "10.60.0.5",
             'reporting_port': 5775,
         },
         'logging': True,
@@ -36,7 +36,7 @@ config = Config(
     service_name='voting',
 )
 jaeger_tracer = config.initialize_tracer()
-tracing = FlaskTracing(jaeger_tracer)
+tracing = FlaskTracing(jaeger_tracer, True, app)
 
 def get_redis():
     if not hasattr(g, 'redis'):
@@ -72,6 +72,7 @@ def hello():
             vote=vote,
         ))
         resp.set_cookie('voter_id', voter_id)
+        time.sleep(2)
         return resp
 
 
