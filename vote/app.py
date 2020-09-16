@@ -28,7 +28,7 @@ config = Config(
             'param': 1,
         },
         'local_agent': {
-            'reporting_host': "10.60.0.5",
+            'reporting_host': "jaeger-agent",
             'reporting_port': 5775,
         },
         'logging': True,
